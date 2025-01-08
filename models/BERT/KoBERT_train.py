@@ -2,6 +2,7 @@ from KoBERT.model_manager import ModelManager
 from KoBERT.training_manager import TrainingManager
 from KoBERT.KoBERTDataset import KoBERTDataset
 
+from transformers import BertForSequenceClassification, BertConfig
 import argparse
 from datasets import load_dataset
 
@@ -19,8 +20,8 @@ def main():
     args = parser.parse_args()
     
     # ✅ Model Manager 초기화
-    model_manager = ModelManager()
-    model, tokenizer = model_manager.initialized_model(num_labels=2)
+    model_manager = ModelManager("monologg/kobert")
+    model, tokenizer = model_manager.initialized_model(model_config=BertConfig, model_pretrained=BertForSequenceClassification, num_labels=2)
     training_manager = TrainingManager(
         model=model, 
         tokenizer=tokenizer, 
@@ -29,7 +30,7 @@ def main():
     )
     
     # ✅ 데이터셋 로드 및 토큰화
-    dataset = load_dataset('UICHEOL-HWANG/hate_speech')
+    dataset = load_dataset('Sessac-Blue/hate-speech')
     train_dataset = KoBERTDataset(dataset[args.train_data], tokenizer=tokenizer, max_length=128)
     valid_dataset = KoBERTDataset(dataset[args.valid_data], tokenizer=tokenizer, max_length=128)
     
