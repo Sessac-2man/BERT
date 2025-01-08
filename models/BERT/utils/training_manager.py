@@ -6,7 +6,7 @@ from transformers import (
 from sklearn.metrics import f1_score, precision_score, recall_score
 import os 
 
-# ✅ GPU 확인 함수
+# GPU 확인 함수
 def check_device():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if torch.cuda.is_available():
@@ -16,7 +16,7 @@ def check_device():
     return device
 
 
-# ✅ 평가 지표 함수
+# 평가 지표 함수
 def compute_metrics(eval_pred):
     """
     검증 시 F1 Score, Precision, Recall을 계산합니다.
@@ -36,7 +36,7 @@ def compute_metrics(eval_pred):
     }
 
 
-# ✅ TrainingManager 클래스
+# TrainingManager 클래스
 class TrainingManager:
     def __init__(self, model, tokenizer, learning_rate, epochs=5):
         self.learning_rate = learning_rate
@@ -68,10 +68,11 @@ class TrainingManager:
             metric_for_best_model='f1',         # 최적 모델 기준
             fp16=True if torch.cuda.is_available() else False,  # Mixed Precision 활성화
             report_to='none',                   # TensorBoard 비활성화
-            logging_first_step=True             # 첫 스텝부터 로그 출력
+            logging_first_step=True,             # 첫 스텝부터 로그 출력
+            max_grad_norm=1.0   
         )
         
-        # ✅ Trainer 객체 생성
+        # Trainer 객체 생성
         trainer = Trainer(
             model=self.model,
             args=training_args,
@@ -81,18 +82,18 @@ class TrainingManager:
             compute_metrics=compute_metrics
         )
         
-        # 🚀 학습 실행
+        # 학습 실행
         print("🚀 Starting Training...")
         trainer.train()
         
-        # ✅ 검증 실행
+        # 검증 실행
         print("📊 Running Validation...")
         eval_results = trainer.evaluate()
         print("✅ Validation Results:")
         for key, value in eval_results.items():
             print(f"{key}: {value:.4f}")
         
-        # ✅ 최적 모델 및 토크나이저 저장
+        # 최적 모델 및 토크나이저 저장
         print("💾 Saving Best Model and Tokenizer...")
         trainer.save_model(output_dir)
         self.tokenizer.save_pretrained(output_dir)
