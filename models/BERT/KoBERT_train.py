@@ -17,7 +17,7 @@ def main():
     parser.add_argument('--batch_size', type=int, default=32, help='Batch size for training and validation')
     parser.add_argument('--train_data', type=str, default='train', help='Training dataset split')
     parser.add_argument('--valid_data', type=str, default='test', help='Validation dataset split')
-    parser.add_argument('--output_dir', type=str, default='./output', help='Directory to save the model')
+    parser.add_argument('--output_dir', type=str, default='./KoOutput', help='Directory to save the model')
     args = parser.parse_args()
     
     # ✅ Model Manager 초기화

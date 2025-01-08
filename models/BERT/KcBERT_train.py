@@ -16,7 +16,7 @@ def main():
     parser.add_argument('--batch_size', type=int, default=16, help='Batch size for training and validation')
     parser.add_argument('--train_data', type=str, default='train', help='Training dataset split')
     parser.add_argument('--valid_data', type=str, default='test', help='Validation dataset split')
-    parser.add_argument('--output_dir', type=str, default='./KcOuput', help='Directory to save the model')
+    parser.add_argument('--output_dir', type=str, default='./KcOutput', help='Directory to save the model')
     args = parser.parse_args()
     
     model_manager = ModelManager("beomi/KcBERT-base")
