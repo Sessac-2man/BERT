@@ -44,7 +44,7 @@ services:
       - /bin/sh
       - -c
       - |
-        mc config host add mlflowminio http://mlflow-artifact-store:9000 minio miniostorage &&
+        mc config host add mlflowminio http://mlflow-artifact-store:9000 mastermino master1234! &&
         mc mb --ignore-existing mlflowminio/mlflow
         mlflow server \
         --backend-store-uri postgresql://masterlabs:master!1234@mlflow-backend-store/modelpo \
