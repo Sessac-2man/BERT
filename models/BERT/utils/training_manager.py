@@ -4,7 +4,9 @@ from transformers import (
     TrainingArguments
 )
 from sklearn.metrics import f1_score, precision_score, recall_score
-import os 
+import mlflow, mlflow.pytorch
+from tracking.save_registry import SaveTracking
+
 
 # GPU 확인 함수
 def check_device():
@@ -38,25 +40,29 @@ def compute_metrics(eval_pred):
 
 # TrainingManager 클래스
 class TrainingManager:
-    def __init__(self, model, tokenizer, learning_rate, epochs=5):
+    def __init__(self, model, tokenizer, learning_rate, experiment, epochs=5):
         self.learning_rate = learning_rate
         self.model = model
         self.tokenizer = tokenizer
         self.device = check_device()
         self.model.to(self.device)
         self.epochs = epochs
-        self.current_dir = os.path.dirname(os.path.abspath(__file__))
+        self.experiment = experiment
         
+        # 실험 세팅
+        mlflow.set_tracking_uri(SaveTracking().mlflow_url)
+        mlflow.set_experiment(self.experiment)
+        print(f"실험 설정 완료 실험버전명 {self.experiment}")
     
-    def train(self, train_dataset, valid_dataset, output_dir):
+    def train(self, train_dataset, valid_dataset, output_dir, train_batch_size, valid_batch_size):
         """
         모델 학습, 검증 및 최적 모델 저장
         """
         training_args = TrainingArguments(
             output_dir=output_dir,             # 결과 저장 경로
             num_train_epochs=self.epochs,       # 학습 Epoch 수
-            per_device_train_batch_size=16,     # GPU당 학습 배치 크기
-            per_device_eval_batch_size=16,      # GPU당 검증 배치 크기
+            per_device_train_batch_size=train_batch_size,     # GPU당 학습 배치 크기
+            per_device_eval_batch_size=valid_batch_size,      # GPU당 검증 배치 크기
             warmup_steps=100,                   # 학습률 스케줄링을 위한 웜업 스텝
             weight_decay=0.01,                  # 가중치 감소
             logging_dir='./logs',               # 로그 저장 경로
@@ -82,21 +88,34 @@ class TrainingManager:
             compute_metrics=compute_metrics
         )
         
-        # 학습 실행
-        print("🚀 Starting Training...")
-        trainer.train()
+        with mlflow.start_run():
+            mlflow.log_param("learning_rate", self.learning_rate)
+            mlflow.log_param("epochs", self.epochs)
+            mlflow.log_param("train_batch_size", train_batch_size)
+            mlflow.log_param("valid_batch_size", valid_batch_size)
+            # 학습 실행
+            print("🚀 Starting Training...")
+            trainer.train()
         
-        # 검증 실행
-        print("📊 Running Validation...")
-        eval_results = trainer.evaluate()
-        print("✅ Validation Results:")
-        for key, value in eval_results.items():
-            print(f"{key}: {value:.4f}")
+            # 검증 실행
+            print("📊 Running Validation...")
+            eval_results = trainer.evaluate()
+            print("✅ Validation Results:")
+            for key, value in eval_results.items():
+                print(f"{key}: {value:.4f}")
+                # 로깅 결과 수집 
+                mlflow.log_metric(key, value)
         
-        # 최적 모델 및 토크나이저 저장
-        print("💾 Saving Best Model and Tokenizer...")
-        trainer.save_model(output_dir)
-        self.tokenizer.save_pretrained(output_dir)
-        print(f"✅ Model and Tokenizer Saved at {output_dir}")
-        
+            # 최적 모델 및 토크나이저 저장
+            print("💾 Saving Best Model and Tokenizer...")
+            trainer.save_model(output_dir)
+            self.tokenizer.save_pretrained(output_dir)
+            print(f"✅ Model and Tokenizer Saved at {output_dir}")
+            
+            mlflow.pytorch.log_model(self.model, artifact_path=f"{self.experiment}/model")
+            mlflow.log_artifacts(output_dir, artifact_path=f"{self.experiment}/artifacts")
+            
+            print(f"모델 저장완로: {self.experiment}/model")
+            print(f"아티팩트 저장완료: {self.experiment}/artifacts")
+            
         return eval_results
