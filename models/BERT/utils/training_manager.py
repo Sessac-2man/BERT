@@ -130,7 +130,7 @@ class TrainingManager:
             self.tokenizer.save_pretrained(output_dir)
             print(f"✅ Model and Tokenizer Saved at {output_dir}")
             
-            unwrapped_model = self.accelerator.unwrap_model(self.model)
+            unwrapped_model = self.accelerator.unwrap_model(trainer.model)
             mlflow.pytorch.log_model(unwrapped_model, artifact_path=f"{self.experiment}/model")
             mlflow.log_artifacts(output_dir, artifact_path=f"{self.experiment}/artifacts")
             

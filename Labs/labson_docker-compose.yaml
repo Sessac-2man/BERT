@@ -22,6 +22,8 @@ services:
       - 9001:9001
     env_file:
       - ./.env
+    volumes:
+      - minio_data:/data
     environment:
       MINIO_ACCESS_KEY: ${AWS_ACCESS_KEY_ID}
       MINIO_SECRET_KEY: ${AWS_SECRET_ACCESS_KEY}
@@ -54,6 +56,8 @@ services:
       MLFLOW_S3_ENDPOINT_URL : ${MLFLOW_S3_ENDPOINT_URL}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID} 
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_ACCESS_KEY: ${MINIO_SECRET_ACCESS_KEY}
     command:
       - /bin/sh
       - -c
@@ -64,3 +68,6 @@ services:
         --backend-store-uri ${MLFLOW_BACKEND_STORE_URI} \
         --default-artifact-root ${MLFLOW_ARTIFACT_STORE_URI} \
         --host 0.0.0.0
+
+volumes:
+  minio_data:
