@@ -1,6 +1,5 @@
 import torch.nn as nn
 from .model_manager import ModelManager
-from tracking.save_registry import SaveTracking
 
 class DistilBERTClassifier(nn.Module):
     def __init__(self, model_module, model_name, num_labels):
