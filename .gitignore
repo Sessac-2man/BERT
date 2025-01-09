@@ -79,6 +79,7 @@ target/
 
 models/BERT/KoOutput/
 models/BERT/KcOutput/
+models/BERT/DistilOutput/
 
 # Jupyter Notebook
 .ipynb_checkpoints
