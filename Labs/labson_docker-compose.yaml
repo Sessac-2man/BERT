@@ -4,8 +4,12 @@ services:
     container_name: mlflow-backend-store
     env_file:
       - ./.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     healthcheck:
-      test: ["CMD", "pg_isready", "-q", "-U", "masterlabs", "-d", "modelpo"]
+      test: ["CMD", "pg_isready", "-q", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -18,6 +22,9 @@ services:
       - 9001:9001
     env_file:
       - ./.env
+    environment:
+      MINIO_ACCESS_KEY: ${AWS_ACCESS_KEY_ID}
+      MINIO_SECRET_KEY: ${AWS_SECRET_ACCESS_KEY}
     command: server /data/minio --console-address :9001
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
@@ -39,14 +46,21 @@ services:
       - 5001:5000
     env_file:
       - ./.env
-
+    # 아무리 env_file로 경로를 지정해도 어떤 값을 넣을지를 명확하게 지정해야함 
+    environment:
+      # 환경변수 내 존재하는 시크릿키 
+      MLFLOW_BACKEND_STORE_URI: ${MLFLOW_BACKEND_STORE_URI}
+      MLFLOW_ARTIFACT_STORE_URI: ${MLFLOW_ARTIFACT_STORE_URI}
+      MLFLOW_S3_ENDPOINT_URL : ${MLFLOW_S3_ENDPOINT_URL}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID} 
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
     command:
       - /bin/sh
       - -c
       - |
-        mc config host add mlflowminio http://mlflow-artifact-store:9000 minio miniostorage &&
-        mc mb --ignore-existing mlflowminio/mlflow
+        mc config host add mlflowminio http://mlflow-artifact-store:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} &&
+        mc mb --ignore-existing mlflowminio/mlflow &&
         mlflow server \
-        --backend-store-uri postgresql://masterlabs:master!1234@mlflow-backend-store/modelpo \
-        --default-artifact-root s3://mlflow/ \
+        --backend-store-uri ${MLFLOW_BACKEND_STORE_URI} \
+        --default-artifact-root ${MLFLOW_ARTIFACT_STORE_URI} \
         --host 0.0.0.0

@@ -6,6 +6,7 @@ from transformers import (
 from sklearn.metrics import f1_score, precision_score, recall_score
 import mlflow, mlflow.pytorch
 from tracking.save_registry import SaveTracking
+from accelerate import Accelerator
 
 
 # GPU 확인 함수
@@ -48,13 +49,22 @@ class TrainingManager:
         self.model.to(self.device)
         self.epochs = epochs
         self.experiment = experiment
+        self.accelerator = Accelerator()
         
         # 실험 세팅
         mlflow.set_tracking_uri(SaveTracking().mlflow_url)
         mlflow.set_experiment(self.experiment)
         print(f"실험 설정 완료 실험버전명 {self.experiment}")
     
-    def train(self, train_dataset, valid_dataset, output_dir, train_batch_size, valid_batch_size):
+    def train(self, train_dataset, 
+              valid_dataset, 
+              output_dir, 
+              train_batch_size, 
+              valid_batch_size,
+              weight_decay,
+              grad_norm,
+              logging_dir
+              ):
         """
         모델 학습, 검증 및 최적 모델 저장
         """
@@ -64,8 +74,8 @@ class TrainingManager:
             per_device_train_batch_size=train_batch_size,     # GPU당 학습 배치 크기
             per_device_eval_batch_size=valid_batch_size,      # GPU당 검증 배치 크기
             warmup_steps=100,                   # 학습률 스케줄링을 위한 웜업 스텝
-            weight_decay=0.01,                  # 가중치 감소
-            logging_dir='./logs',               # 로그 저장 경로
+            weight_decay=weight_decay,                  # 가중치 감소
+            logging_dir=logging_dir,               # 로그 저장 경로
             logging_steps=10,                   # 로그 출력 간격
             evaluation_strategy='steps',        # 매 Epoch마다 Validation 실행
             eval_steps=500,
@@ -73,9 +83,9 @@ class TrainingManager:
             load_best_model_at_end=True,        # 최적의 모델 불러오기
             metric_for_best_model='f1',         # 최적 모델 기준
             fp16=True if torch.cuda.is_available() else False,  # Mixed Precision 활성화
-            report_to='none',                   # TensorBoard 비활성화
+            report_to='mlflow',                   # mlflow로 세팅
             logging_first_step=True,             # 첫 스텝부터 로그 출력
-            max_grad_norm=1.0   
+            max_grad_norm=grad_norm 
         )
         
         # Trainer 객체 생성
@@ -93,9 +103,17 @@ class TrainingManager:
             mlflow.log_param("epochs", self.epochs)
             mlflow.log_param("train_batch_size", train_batch_size)
             mlflow.log_param("valid_batch_size", valid_batch_size)
+            mlflow.log_param("max_grad_norm", grad_norm)
+            mlflow.log_param("log_dir", logging_dir)
+            
+            
             # 학습 실행
             print("🚀 Starting Training...")
-            trainer.train()
+            training = trainer.train()
+
+            mlflow.log_metric("train_loss", training.metrics["train_loss"])
+            mlflow.log_metric("train_runtime", training.metrics["train_runtime"])
+            mlflow.log_metric("train_samples_per_second", training.metrics["train_samples_per_second"])
         
             # 검증 실행
             print("📊 Running Validation...")
@@ -112,7 +130,8 @@ class TrainingManager:
             self.tokenizer.save_pretrained(output_dir)
             print(f"✅ Model and Tokenizer Saved at {output_dir}")
             
-            mlflow.pytorch.log_model(self.model, artifact_path=f"{self.experiment}/model")
+            unwrapped_model = self.accelerator.unwrap_model(self.model)
+            mlflow.pytorch.log_model(unwrapped_model, artifact_path=f"{self.experiment}/model")
             mlflow.log_artifacts(output_dir, artifact_path=f"{self.experiment}/artifacts")
             
             print(f"모델 저장완로: {self.experiment}/model")

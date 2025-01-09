@@ -18,6 +18,10 @@ def main():
     parser.add_argument('--train_data', type=str, default='train', help='Training dataset split')
     parser.add_argument('--valid_data', type=str, default='test', help='Validation dataset split')
     parser.add_argument('--output_dir', type=str, default='./KoOutput', help='Directory to save the model')
+    parser.add_argument('--experiment', type=str, default='KoBERT_v1', help='experiment set name')
+    parser.add_argument('--weight_decay', type=str, default='0.01', help='영어 쓰기 귀찮아서 한글 쓴다 가중치 제한(감소)')
+    parser.add_argument('--grad_norm', type=str, default='1.0', help='그래디언트 클리핑 제한 ')
+    parser.add_argument('--logging_dir', type=str, default='./logs', help='saving log')
     args = parser.parse_args()
     
     # ✅ Model Manager 초기화
@@ -37,8 +41,16 @@ def main():
     
     # 🚀 Training & Validation
     print("🚀 Starting Training and Validation...")
-    results = training_manager.train(train_dataset, valid_dataset, args.output_dir)
     
+    results = training_manager.train(train_dataset, 
+                                valid_dataset, 
+                                output_dir=args.output_dir, 
+                                train_batch_size=args.batch_size, 
+                                valid_batch_size=args.batch_size,
+                                weight_decay=args.weight_decay,
+                                grad_norm=args.grad_norm
+                                )
+        
     print("✅ Final Validation Results:")
     for key, value in results.items():
         print(f"{key}: {value:.4f}")
