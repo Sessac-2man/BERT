@@ -3,7 +3,7 @@ from .model_manager import ModelManager
 from tracking.save_registry import SaveTracking
 
 class DistilBERTClassifier(nn.Module):
-    def __init__(self, model_module, model_name, num_labels):
+    def __init__(self, model_module, model_config, model_name, num_labels):
         super(DistilBERTClassifier, self).__init__()
         
         model_manager = ModelManager(model_name)
@@ -11,11 +11,11 @@ class DistilBERTClassifier(nn.Module):
         self.label2id = model_manager.label2id
         
         # Pretrained 모델 로드 및 Config 업데이트
+        self.model_config = model_config.from_pretrained(model_name, id2label=self.id2label, label2id=self.label2id, num_labels=num_labels)
         self.model_module = model_module.from_pretrained(
             model_name,
-            num_labels=num_labels,
-            id2label=self.id2label,
-            label2id=self.label2id
+            config=self.model_config,
+            trust_remote_code=True
         )
         
         self.dropout = nn.Dropout(0.1)

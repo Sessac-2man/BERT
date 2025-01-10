@@ -3,7 +3,7 @@ from utils.training_manager import TrainingManager
 from utils.KoBERTDataset import KoBERTDataset
 from utils.DistilKoBERT_neural import DistilBERTClassifier
 
-from transformers import DistilBertModel, DistilBertTokenizer
+from transformers import DistilBertModel, DistilBertTokenizer, DistilBertConfig
 import argparse
 from datasets import load_dataset
 
@@ -29,7 +29,8 @@ def main():
     model = DistilBERTClassifier(
         model_module=DistilBertModel,
         model_name='monologg/distilkobert',
-        num_labels=2  # 예: 긍정/부정 분류
+        model_config=DistilBertConfig,
+        num_labels=2
     )
     
     training_manager = TrainingManager(

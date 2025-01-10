@@ -6,7 +6,14 @@ from transformers import (
 from sklearn.metrics import f1_score, precision_score, recall_score
 import mlflow, mlflow.pytorch
 from tracking.save_registry import SaveTracking
-from accelerate import Accelerator
+import os 
+
+os_trace = SaveTracking()
+
+os.environ["MLFLOW_S3_ENDPOINT_URL"] = os_trace.bucket_url
+os.environ["MLFLOW_TRACKING_URI"] = os_trace.mlflow_url
+os.environ["AWS_ACCESS_KEY_ID"] = os_trace.minio
+os.environ["AWS_SECRET_ACCESS_KEY"] = os_trace.minio_key
 
 
 # GPU 확인 함수
@@ -49,10 +56,9 @@ class TrainingManager:
         self.model.to(self.device)
         self.epochs = epochs
         self.experiment = experiment
-        self.accelerator = Accelerator()
         
         # 실험 세팅
-        mlflow.set_tracking_uri(SaveTracking().mlflow_url)
+        mlflow.set_tracking_uri(os_trace.mlflow_url)
         mlflow.set_experiment(self.experiment)
         print(f"실험 설정 완료 실험버전명 {self.experiment}")
     
@@ -104,7 +110,7 @@ class TrainingManager:
             mlflow.log_param("train_batch_size", train_batch_size)
             mlflow.log_param("valid_batch_size", valid_batch_size)
             mlflow.log_param("max_grad_norm", grad_norm)
-            mlflow.log_param("log_dir", logging_dir)
+
             
             
             # 학습 실행
@@ -130,11 +136,8 @@ class TrainingManager:
             self.tokenizer.save_pretrained(output_dir)
             print(f"✅ Model and Tokenizer Saved at {output_dir}")
             
-            unwrapped_model = self.accelerator.unwrap_model(trainer.model)
-            mlflow.pytorch.log_model(unwrapped_model, artifact_path=f"{self.experiment}/model")
             mlflow.log_artifacts(output_dir, artifact_path=f"{self.experiment}/artifacts")
             
-            print(f"모델 저장완로: {self.experiment}/model")
             print(f"아티팩트 저장완료: {self.experiment}/artifacts")
             
         return eval_results
