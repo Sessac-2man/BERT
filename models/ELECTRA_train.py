@@ -17,7 +17,7 @@ def main():
     parser.add_argument('--train_data', type=str, default='train', help='Training dataset split')
     parser.add_argument('--valid_data', type=str, default='test', help='Validation dataset split')
     parser.add_argument('--output_dir', type=str, default='./KcELECTRA_Output', help='Directory to save the model')
-    parser.add_argument('--experiment', type=str, default='KcELECTRA_v1', help='experiment set name')
+    parser.add_argument('--experiment', type=str, default='KcELECTRA_v2', help='experiment set name')
     parser.add_argument('--weight_decay', type=float, default='0.01', help='영어 쓰기 귀찮아서 한글 쓴다 가중치 제한(감소)')
     parser.add_argument('--grad_norm', type=float, default='1.0', help='그래디언트 클리핑 제한 ')
     parser.add_argument('--logging_dir', type=str, default='./logs', help='로그 수집')

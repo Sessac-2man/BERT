@@ -12,6 +12,7 @@ os_trace = SaveTracking()
 
 os.environ["MLFLOW_S3_ENDPOINT_URL"] = os_trace.bucket_url
 os.environ["MLFLOW_TRACKING_URI"] = os_trace.mlflow_url
+os.environ["BUCKET_URL"] = os_trace.bucket_url
 os.environ["AWS_ACCESS_KEY_ID"] = os_trace.minio
 os.environ["AWS_SECRET_ACCESS_KEY"] = os_trace.minio_key
 
