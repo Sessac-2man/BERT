@@ -21,8 +21,8 @@ class SaveTracking:
         
         self.mlflow_url = os.getenv("MLFLOW_URL")
         self.bucket_url = os.getenv("BUCKET_URL")
-        self.minio = os.getenv("MINIO_ROOT_USER")
-        self.minio_key = os.getenv("MINIO_ROOT_PASSWORD")
+        self.minio = os.getenv("AWS_ACCESS_KEY_ID")
+        self.minio_key = os.getenv("AWS_SECRET_ACCESS_KEY")
         self.s3 = os.getenv("MLFLOW_ARTIFACT_STORE_URI")
     def connect_to_database(self):
         try:
