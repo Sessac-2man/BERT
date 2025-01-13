@@ -13,6 +13,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - labson_network
 
   mlflow-artifact-store:
     image: minio/minio:RELEASE.2024-01-18T22-51-28Z
@@ -25,14 +27,16 @@ services:
     volumes:
       - minio_data:/data
     environment:
-      MINIO_ACCESS_KEY: ${AWS_ACCESS_KEY_ID}
-      MINIO_SECRET_KEY: ${AWS_SECRET_ACCESS_KEY}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command: server /data/minio --console-address :9001
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - labson_network
 
   mlflow-server:
     build:
@@ -48,17 +52,12 @@ services:
       - 5001:5000
     env_file:
       - ./.env
-    # 아무리 env_file로 경로를 지정해도 어떤 값을 넣을지를 명확하게 지정해야함 
     environment:
-      # 환경변수 내 존재하는 시크릿키 
       MLFLOW_BACKEND_STORE_URI: ${MLFLOW_BACKEND_STORE_URI}
       MLFLOW_ARTIFACT_STORE_URI: ${MLFLOW_ARTIFACT_STORE_URI}
-      MLFLOW_S3_ENDPOINT_URL : ${MLFLOW_S3_ENDPOINT_URL}
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      MINIO_ROOT_USER : ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD : ${MINIO_ROOT_PASSWORD}
-
+      MLFLOW_S3_ENDPOINT_URL: ${MLFLOW_S3_ENDPOINT_URL}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command:
       - /bin/sh
       - -c
@@ -69,6 +68,13 @@ services:
         --backend-store-uri ${MLFLOW_BACKEND_STORE_URI} \
         --default-artifact-root ${MLFLOW_ARTIFACT_STORE_URI} \
         --host 0.0.0.0
+    networks:
+      - labson_network
+
 
 volumes:
   minio_data:
+
+networks:
+  labson_network:
+    external: true
