@@ -77,9 +77,10 @@ docs/_build/
 .pybuilder/
 target/
 
-models/BERT/KoOutput/
-models/BERT/KcOutput/
-
+models/KoOutput/
+models/KcOutput/
+models/DistilOutput/
+models/KcELECTRA_Output
 # Jupyter Notebook
 .ipynb_checkpoints
 

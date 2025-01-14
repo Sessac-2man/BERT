@@ -1,0 +1,17 @@
+services:
+  nginx:
+    container_name: nginx
+    build:
+      context: ./nginx  # Nginx Dockerfile 디렉토리
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
+    networks:
+      - labson_network
+
+
+networks:
+  labson_network:
+    external: true 
