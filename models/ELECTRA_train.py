@@ -35,8 +35,8 @@ def main():
     
     # ✅ 데이터셋 로드 및 토큰화
     dataset = load_dataset('Sessac-Blue/hate-speech')
-    train_dataset = KoBERTDataset(dataset[args.train_data], tokenizer=tokenizer, use_token_type_ids=True, max_length=128)
-    valid_dataset = KoBERTDataset(dataset[args.valid_data], tokenizer=tokenizer, use_token_type_ids=True, max_length=128)
+    train_dataset = KoBERTDataset(dataset[args.train_data][:300], tokenizer=tokenizer, use_token_type_ids=True, max_length=128)
+    valid_dataset = KoBERTDataset(dataset[args.valid_data][:100], tokenizer=tokenizer, use_token_type_ids=True, max_length=128)
     # 🚀 Training & Validation
     print("🚀 Starting Training and Validation...")
     

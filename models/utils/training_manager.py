@@ -8,13 +8,13 @@ import mlflow, mlflow.pytorch
 from tracking.save_registry import SaveTracking
 import os 
 
-os_trace = SaveTracking()
+tracking = SaveTracking()
 
-os.environ["MLFLOW_S3_ENDPOINT_URL"] = os_trace.bucket_url
-os.environ["MLFLOW_TRACKING_URI"] = os_trace.mlflow_url
-os.environ["BUCKET_URL"] = os_trace.bucket_url
-os.environ["AWS_ACCESS_KEY_ID"] = os_trace.minio
-os.environ["AWS_SECRET_ACCESS_KEY"] = os_trace.minio_key
+os.environ["MLFLOW_S3_ENDPOINT_URL"] = tracking.mlflow_s3_endpoint
+os.environ["MLFLOW_TRACKING_URI"] = tracking.mlflow_tracking_uri
+os.environ["AWS_ACCESS_KEY_ID"] =  tracking.minio_access_key
+os.environ["AWS_SECRET_ACCESS_KEY"] = tracking.minio_secret_key
+
 
 
 # GPU 확인 함수
@@ -59,7 +59,7 @@ class TrainingManager:
         self.experiment = experiment
         
         # 실험 세팅
-        mlflow.set_tracking_uri(os_trace.mlflow_url)
+        mlflow.set_tracking_uri(tracking.mlflow_tracking_uri)
         mlflow.set_experiment(self.experiment)
         print(f"실험 설정 완료 실험버전명 {self.experiment}")
     

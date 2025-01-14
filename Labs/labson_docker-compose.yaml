@@ -62,10 +62,9 @@ services:
       - /bin/sh
       - -c
       - |
-        mc config host add mlflowminio http://mlflow-artifact-store:9000 ${AWS_ACCESS_KEY_ID} ${AWS_SECRET_ACCESS_KEY} &&
+        mc config host add mlflowminio ${MLFLOW_S3_ENDPOINT_URL} ${AWS_ACCESS_KEY_ID} ${AWS_SECRET_ACCESS_KEY} &&
         mc mb --ignore-existing mlflowminio/mlflow &&
         mlflow server \
-        --backend-store-uri ${MLFLOW_BACKEND_STORE_URI} \
         --default-artifact-root ${MLFLOW_ARTIFACT_STORE_URI} \
         --host 0.0.0.0
     networks:
