@@ -21,7 +21,6 @@ class SaveTracking:
         # MLflow 설정 정보
         self.mlflow_tracking_uri = os.getenv("MLFLOW_URL")  # MLflow Tracking Server URI
         self.mlflow_s3_endpoint = os.getenv("MLFLOW_S3_ENDPOINT")  # MinIO S3 엔드포인트
-        self.mlflow_artifact_store = os.getenv("MLFLOW_ARTIFACT_STORE_URI")  # S3 버킷 URI
 
         # MinIO 설정 정보
         self.minio_access_key = os.getenv("AWS_ACCESS_KEY_ID")  # MinIO Access Key
