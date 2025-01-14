@@ -137,8 +137,8 @@ class TrainingManager:
             self.tokenizer.save_pretrained(output_dir)
             print(f"✅ Model and Tokenizer Saved at {output_dir}")
             
-            mlflow.log_artifacts(output_dir, artifact_path=f"{self.experiment}/artifacts")
+            mlflow.log_artifacts(output_dir, artifact_path=f"{self.experiment}/outputs")
             
-            print(f"아티팩트 저장완료: {self.experiment}/artifacts")
+            print(f"아티팩트 저장완료: {self.experiment}/outputs")
             
         return eval_results
