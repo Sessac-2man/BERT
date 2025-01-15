@@ -4,9 +4,9 @@ import os
 
 class Connect:
     def __init__(self):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        dotenv_path = os.path.join(current_dir, "C:/Users/user/Desktop/BERThub/Labs/.env")
-        load_dotenv(dotenv_path=dotenv_path)
+        # current_dir = os.path.dirname(os.path.abspath(__file__))
+        # dotenv_path = os.path.join(current_dir, "C:/Users/user/Desktop/BERThub/Labs/.env")
+        # load_dotenv(dotenv_path=dotenv_path)
         
         # host connect 
         

@@ -1,0 +1,26 @@
+services:
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./.env
+    environment:
+      MLFLOW_TRACKING_URI: ${MLFLOW_URL}
+      MLFLOW_S3_ENDPOINT : ${MLFLOW_S3_ENDPOINT}
+      MLFLOW_BACKEND_STORE_URI : ${MLFLOW_BACKEND_STORE_URI}
+      MLFLOW_ARTIFACT_STORE_URI: ${MLFLOW_ARTIFACT_STORE_URI}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      POSTGRES_USER : ${POSTGRES_USER}
+      POSTGRES_HOST : ${POSTGRES_HOST}
+      POSTGRES_PORT : ${POSTGRES_PORT}
+      POSTGRES_PASSWORD : ${POSTGRES_PASSWORD}
+    networks:
+      - labson_network  # 서비스에서 네트워크 이름 지정
+
+networks:
+  labson_network:  # 네트워크 정의
+    external: true

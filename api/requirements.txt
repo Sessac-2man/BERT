@@ -1,0 +1,4 @@
+fastapi[all]
+mlflow==2.5.0
+psycopg2-binary
+transformers==4.47.1
