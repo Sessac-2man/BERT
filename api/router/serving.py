@@ -42,7 +42,7 @@ def startup_event():
     except mlflow.exceptions.MlflowException as e:
         logger.error(f"❌ 모델 로드 중 오류 발생: {e}")
         raise e 
- 
+  
 @router.post("/classify", response_model=List[ClassificationResult])
 def classify_text(input: TextInput):
     try:
