@@ -1,4 +1,4 @@
-import psycopg2 
+import psycopg2
 from dotenv import load_dotenv
 import os 
 
@@ -30,8 +30,10 @@ class Connect:
                 host=self.host,
                 port=self.port,
                 database=self.dbname,
-                user=self.user
+                user=self.user,
+                password=self.password
             )
+            print("✅ Database connection successful")
             cursor = conn.cursor()
             
             query = """
@@ -39,15 +41,21 @@ class Connect:
             FROM metrics
             WHERE key = 'loss'
             ORDER BY value ASC
-            LIMIT 1; 
+            LIMIT 1;
             """
-            
             cursor.execute(query=query)
-            best_run_uuid = cursor.fetchone()[0]
+            result = cursor.fetchone()
+            print(f"Query result: {result}")  # 쿼리 결과 출력
             
-            return best_run_uuid
+            if result:
+                best_run_uuid = result[0]
+                print(f"Best run UUID: {best_run_uuid}")  # 디버깅용 출력
+                return best_run_uuid
+            else:
+                print("No results found for the query.")
+                return None
         except Exception as e:
-            print(f"Error : {e}")
-            return None
+            print(f"커넥트 실패 {e}")
+
         
         

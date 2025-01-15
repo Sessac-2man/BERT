@@ -1,12 +1,13 @@
-import os 
+
 from .serving_schemas import TextInput, ClassificationResult
 from inference.inference import load_model
+from utils.connect import Connect
+
+import os 
 from fastapi import APIRouter, HTTPException
 import logging
 from typing import List
 import mlflow
-
-from utils.connect import Connect
 
 tracking = Connect()
 
@@ -17,7 +18,8 @@ os.environ["AWS_ACCESS_KEY_ID"] =  tracking.minio_access_key
 os.environ["AWS_SECRET_ACCESS_KEY"] = tracking.minio_secret_key
 
 # MLflow 런 ID와 아티팩트 경로 설정
-run_id = "54254b91dc594debad19be3799d5508a"  # 실제 Run ID로 변경
+
+run_id = tracking.serach_best_run() # 실제 Run ID로 변경
 artifact_path = "outputs"  # 모델 저장 시 사용한 artifact_path와 일치
 
 # MLflow 아티팩트 URI 구성
