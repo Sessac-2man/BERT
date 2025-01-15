@@ -21,7 +21,7 @@
 
 `Error` : 문제가 무엇인지? 
 
-![alt text](image.png)
+![alt text](./image/image.png)
 
 - boto3 기반으로 운영하는 minio api가 연결되지 않는 문제가 발생 
 - 후술은 귀찮아서 나중에 서술
