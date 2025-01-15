@@ -12,20 +12,20 @@ import mlflow
 # tracking = Connect()
 
 # 환경 변수 설정
-# os.environ["MLFLOW_S3_ENDPOINT_URL"] = tracking.mlflow_s3_endpoint
-# os.environ["MLFLOW_TRACKING_URI"] = tracking.mlflow_tracking_uri
-# os.environ["AWS_ACCESS_KEY_ID"] =  tracking.minio_access_key
-# os.environ["AWS_SECRET_ACCESS_KEY"] = tracking.minio_secret_key
+#os.environ["MLFLOW_S3_ENDPOINT_URL"] = tracking.mlflow_s3_endpoint
+#os.environ["MLFLOW_TRACKING_URI"] = tracking.mlflow_tracking_uri
+#os.environ["AWS_ACCESS_KEY_ID"] =  tracking.minio_access_key
+#os.environ["AWS_SECRET_ACCESS_KEY"] = tracking.minio_secret_key
 
-mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
 os.environ["MLFLOW_S3_ENDPOINT_URL"] = os.getenv("MLFLOW_S3_ENDPOINT_URL")
 os.environ["AWS_ACCESS_KEY_ID"] = os.getenv("AWS_ACCESS_KEY_ID")
+os.environ["MLFLOW_TRACKING_URI"] = os.getenv("MLFLOW_URL")
 os.environ["AWS_SECRET_ACCESS_KEY"] = os.getenv("AWS_SECRET_ACCESS_KEY")
 
 
 # MLflow 런 ID와 아티팩트 경로 설정
 
-run_id = "6d25aebcdd3448ada9919128cf74d563" # 실제 Run ID로 변경
+run_id = "38939a3b5d2c4c8b9a4a469cad1be524" # 실제 Run ID로 변경
 artifact_path = "outputs"  # 모델 저장 시 사용한 artifact_path와 일치
 
 # MLflow 아티팩트 URI 구성
@@ -45,7 +45,7 @@ logger = logging.getLogger(__name__)
 def startup_event():
     global classifier
     try:
-        classifier = mlflow.transformers.load_model(model_uri=model_uri)
+        classifier = mlflow.transformers.load_model(model_uri=model_uri, device="cpu")
         logger.info("✅ 모델이 성공적으로 로드되었습니다.")
     except mlflow.exceptions.MlflowException as e:
         logger.error(f"❌ 모델 로드 중 오류 발생: {e}")

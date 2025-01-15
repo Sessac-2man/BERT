@@ -1,4 +1,7 @@
 fastapi[all]
-mlflow==2.5.0
+mlflow==2.20.0rc0
 psycopg2-binary
-transformers==4.47.1
+transformers==4.26.0
+boto3==1.26.8
+tensorflow==2.12
+torch 
