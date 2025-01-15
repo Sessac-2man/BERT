@@ -1,10 +1,11 @@
 import torch
 from transformers import (
     Trainer,
-    TrainingArguments
+    TrainingArguments,
+    pipeline
 )
 from sklearn.metrics import f1_score, precision_score, recall_score
-import mlflow, mlflow.pytorch
+import mlflow
 from tracking.save_registry import SaveTracking
 import os 
 
@@ -137,7 +138,21 @@ class TrainingManager:
             self.tokenizer.save_pretrained(output_dir)
             print(f"✅ Model and Tokenizer Saved at {output_dir}")
             
-            mlflow.log_artifacts(output_dir, artifact_path=f"{self.experiment}/outputs")
+            task = "text-classification"
+            
+            sentence_pipeline = pipeline(
+                task=task,
+                model=self.model,
+                tokenizer=self.tokenizer,
+                device=0 if torch.cuda.is_available() else -1 
+            )
+            
+            mlflow.transformers.log_model(
+                transformers_model=sentence_pipeline,
+                artifact_path="outputs",
+                task=task,
+                registered_model_name=self.experiment
+            )
             
             print(f"아티팩트 저장완료: {self.experiment}/outputs")
             

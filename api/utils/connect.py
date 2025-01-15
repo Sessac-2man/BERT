@@ -15,6 +15,14 @@ class Connect:
         self.dbname = os.getenv("POSTGRES_DB")
         self.user = os.getenv("POSTGRES_USER")
         self.password = os.getenv("POSTGRES_PASSWORD")
+       # MLflow 설정 정보
+       
+        self.mlflow_tracking_uri = os.getenv("MLFLOW_URL")  # MLflow Tracking Server URI
+        self.mlflow_s3_endpoint = os.getenv("MLFLOW_S3_ENDPOINT")  # MinIO S3 엔드포인트
+
+        # MinIO 설정 정보
+        self.minio_access_key = os.getenv("AWS_ACCESS_KEY_ID")  # MinIO Access Key
+        self.minio_secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")  # MinIO Secret Key
         
     def serach_best_run(self):
         try:

@@ -1,8 +1,9 @@
 from pydantic import BaseModel
 
-class ModelRequest(BaseModel):
-    request : str 
-    
+class TextInput(BaseModel):
+    texts: list[str]
 
-class ModelResponse(BaseModel):
-    response : str 
+class ClassificationResult(BaseModel):
+    text: str
+    label: str
+    score: float
