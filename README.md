@@ -115,6 +115,6 @@ Downloading artifacts: 100%|██████████| 1/1 [00:00<00:00, 77
 
 `mlflow`에 존재하던 양식을 참고하여 적용 
 
-![alt text](image.png)
+![alt text](./image/success.png)
 
 # 성공
