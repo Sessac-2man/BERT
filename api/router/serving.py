@@ -10,23 +10,15 @@ from typing import List
 import mlflow
 import pandas as pd
 
-# tracking = Connect()
-
-# 환경 변수 설정
-#os.environ["MLFLOW_S3_ENDPOINT_URL"] = tracking.mlflow_s3_endpoint
-#os.environ["MLFLOW_TRACKING_URI"] = tracking.mlflow_tracking_uri
-#os.environ["AWS_ACCESS_KEY_ID"] =  tracking.minio_access_key
-#os.environ["AWS_SECRET_ACCESS_KEY"] = tracking.minio_secret_key
 
 os.environ["MLFLOW_S3_ENDPOINT_URL"] = os.getenv("MLFLOW_S3_ENDPOINT_URL")
 os.environ["AWS_ACCESS_KEY_ID"] = os.getenv("AWS_ACCESS_KEY_ID")
 os.environ["MLFLOW_TRACKING_URI"] = os.getenv("MLFLOW_URL")
 os.environ["AWS_SECRET_ACCESS_KEY"] = os.getenv("AWS_SECRET_ACCESS_KEY")
 
+db_connect = Connect()
 
-# MLflow 런 ID와 아티팩트 경로 설정
-
-run_id = "38939a3b5d2c4c8b9a4a469cad1be524" # 실제 Run ID로 변경
+run_id = db_connect.serach_best_run() # 실제 Run ID로 변경
 artifact_path = "outputs"  # 모델 저장 시 사용한 artifact_path와 일치
 
 # MLflow 아티팩트 URI 구성

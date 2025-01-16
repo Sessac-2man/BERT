@@ -1,6 +1,6 @@
 services:
   nginx:
-    container_name: nginx
+    container_name: proxy-server
     build:
       context: ./nginx  # Nginx Dockerfile 디렉토리
       dockerfile: Dockerfile
