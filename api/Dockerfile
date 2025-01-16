@@ -1,19 +1,19 @@
 FROM python:3.9-slim
 
-# Set working directory
+# 작업 디렉토리 설정
 WORKDIR /app
 
-# Install required system packages
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+# pip 업데이트
+RUN pip install --upgrade pip
 
-# Copy application files
-COPY . .
+# PyTorch 설치 (CPU 버전)
+RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 
-# Install Python dependencies
+# 의존성 설치
+COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose the application port
-EXPOSE 8000
+# 애플리케이션 복사
+COPY . .
 
-# Command to run the application
 CMD ["python", "main.py"]

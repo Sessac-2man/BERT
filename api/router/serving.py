@@ -8,6 +8,7 @@ from fastapi import APIRouter, HTTPException
 import logging
 from typing import List
 import mlflow
+import pandas as pd
 
 # tracking = Connect()
 
@@ -45,33 +46,41 @@ logger = logging.getLogger(__name__)
 def startup_event():
     global classifier
     try:
-        classifier = mlflow.transformers.load_model(model_uri=model_uri, device="cpu")
+        # device 옵션 제거
+        classifier = mlflow.pyfunc.load_model(model_uri=model_uri)
         logger.info("✅ 모델이 성공적으로 로드되었습니다.")
     except mlflow.exceptions.MlflowException as e:
         logger.error(f"❌ 모델 로드 중 오류 발생: {e}")
-        raise e 
+        raise e
+
   
 @router.post("/classify", response_model=List[ClassificationResult])
 def classify_text(input: TextInput):
     try:
-        # 분류 수행
-        results = classifier(input.texts)
-        
-        response = [] 
-        
-        for text, res in zip(input.texts, results):
-            # 디버깅을 위한 로그 추가
-            logger.info(f"Input Text: {text}")
-            logger.info(f"Model Label: {res['label']}")
-            logger.info(f"Model Score: {res['score']}")
-            
-            # 레이블 매핑 없이 직접 할당
-            label = str(res['label'])  # 레이블이 정수일 경우 문자열로 변환
-            score = res['score']
-            response.append(ClassificationResult(text=text, label=label, score=score))
-            
+        logger.info(f"📩 Received input: {input.texts}")
+
+        # pandas DataFrame으로 변환
+        input_data = pd.DataFrame({"text": input.texts})
+
+        # 예측 수행
+        results = classifier.predict(input_data)  # DataFrame 반환
+        logger.info(f"✅ Raw Model Output:\n{results}")
+
+        response = []
+        for _, row in results.iterrows():  # DataFrame의 각 행 처리
+            label = row["label"]
+            score = row["score"] if row["score"] is not None else 0.0  # None 방지
+
+            logger.info(f"📝 Input Text: {input.texts}")
+            logger.info(f"🔖 Predicted Label: {label}")
+            logger.info(f"📊 Predicted Score: {score}")
+
+            # 응답 생성
+            response.append(ClassificationResult(text=input.texts[0], label=label, score=score))
+
+        logger.info("✅ Response successfully generated.")
         return response
 
     except Exception as e:
-        logger.error(f"❌ 분류 중 오류 발생: {e}")
+        logger.error(f"❌ Error during classification: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal Server Error")
